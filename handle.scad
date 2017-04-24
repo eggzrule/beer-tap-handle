@@ -2,11 +2,13 @@
 include <threads/threads_20161204.scad>
 
 // smoothness of anything rounded
-$fn = 300;
+$fn         = 365;
 // millimeter to inches
-mm_in_inch=25.4;
+mm_in_inch  = 25.4;
 
-// draw the handle 
+// draw the handle
+//rotate([0,0,$t*360])
+//translate([-handle_radius_top, -handle_radius_top, 0])
 handleWithLogo();
 
 // draw the test cube with threads
@@ -21,7 +23,7 @@ thread_offset_from_bottom   = (0.1 * mm_in_inch);
 module threadsWithOffset () {
     radius = (thread_diameter / 2 * mm_in_inch);
     
-    union () {
+    //union () {
         translate([
             radius,
             radius,
@@ -41,7 +43,7 @@ module threadsWithOffset () {
             d       = (thread_diameter * mm_in_inch),
             center  = false
         );
-    }
+    //}
 }
 
 // handle parameters
@@ -50,7 +52,7 @@ handle_raidus           = 10;
 handle_radius_top       = 22;
 handle_threads_offset   = handle_radius_top - ((thread_diameter * mm_in_inch) / 2);
 module handle () {
-    union() {
+    //union() {
         translate([handle_radius_top, handle_radius_top, handle_height / 2])
         minkowski() {
             cylinder(
@@ -69,56 +71,40 @@ module handle () {
         ])
         rotate([90,0,0])
         minkowski() {
-            cube([(handle_radius_top * 2) - 10, (handle_radius_top * 2) - 10, 3], true);
+            cube([
+                (handle_radius_top * 2) - 10,
+                (handle_radius_top * 2) - 10,
+                3],
+                true
+            );
             cylinder(
                 h       = 4,
                 r       = 2,
                 center  = true
             );
         }
-    }
+    //}
 }
 
-
-module logo(desiredWidth) {
-    /*// logo constants
-    logo_length = 400;
-    logo_width  = 400;
-    
-    scale_factor = desiredWidth / logo_width;
-    scale([scale_factor, scale_factor, 0.1])
-    union() {
-        difference() {
-            surface(
-                file        = "logo/logo_3000x3000_30mm.png",
-                center      = false,
-                invert      = false
-            );
-            cube([logo_width, logo_length, 1.1], false);
-        }
-    }*/
-    
-    // logo constants
-    logo_length = 100;
-    logo_width  = 100;
-    
-    scale_factor = (desiredWidth / logo_width);
-    scale([scale_factor, scale_factor, 1])
-    import("logo/logo_100mm.stl", center=false);
-}
 
 module handleWithLogo() {
-    // build the handle
-    difference() {
-        handle();
-        translate([handle_threads_offset, handle_threads_offset, 0])
-        threadsWithOffset();
-    }
-    
-    // render the logo
-    translate([3, handle_radius_top - 1.4, handle_height])
-    rotate([90, 0, 0])
-    logo((handle_radius_top * 2) - 6);
+    //union() {
+        // build the handle
+        difference() {
+            handle();
+            translate([handle_threads_offset, handle_threads_offset, 0])
+            threadsWithOffset();
+        }
+        
+        // render the logo
+        logo_size = 36; //(handle_radius_top * 2) - 6 - 2; //currently 36mm
+        translate([
+            (logo_size / 2) + 3 + 1,
+            handle_radius_top - 1.5 + 1,
+            (logo_size / 2) + handle_height])
+        rotate([90, 0, 0])
+        import("logo/logo_36mm.stl");
+    //}
 }
 
 module testCube() {

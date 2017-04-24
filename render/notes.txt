@@ -1,0 +1,6 @@
+OpenSCAD Animate Options:
+	FPS:	24
+	Steps:	360
+
+Image Magick Command line:
+	magick frames\frame*.png -set delay 1x24 animated.gif
