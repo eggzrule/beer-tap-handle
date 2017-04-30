@@ -1,0 +1,7 @@
+STL generated using Simplify3D "Convert Image to 3D" add on.
+	Image Depth Scale:	10  mm
+	Desired Width:		300 mm
+	Platform Height:	1   mm
+
+	Gaussian filter factor:	0.5
+	Invert Depth Profile:	No

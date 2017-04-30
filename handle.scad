@@ -9,10 +9,10 @@ mm_in_inch  = 25.4;
 // draw the handle
 //rotate([0,0,$t*360])
 //translate([-handle_radius_top, -handle_radius_top, 0])
-handleWithLogo();
+//handleWithLogo();
 
 // draw the test cube with threads
-//testCube();
+cubeWithThreads();
 
 
 // thread parameters
@@ -46,11 +46,26 @@ module threadsWithOffset () {
     }
 }
 
+// cube parameters
+cube_threads_offset = 3;
+cube_size           = (thread_diameter * mm_in_inch) + cube_threads_offset;
+cube_height         = (threads_length * mm_in_inch) + thread_offset_from_bottom + 10;
+module cubeWithThreads() {
+    difference() {
+        cubeNoThreads();
+        translate([cube_threads_offset / 2, cube_threads_offset / 2, 0])
+        threadsWithOffset();
+    }
+}
+module cubeNoThreads() {
+    cube([cube_size, cube_size, cube_height]);
+}
+
 // handle parameters
-handle_height           = 80;
-handle_raidus           = 10;
-handle_radius_top       = 22;
-handle_threads_offset   = handle_radius_top - ((thread_diameter * mm_in_inch) / 2);
+handle_height       = 80;
+handle_raidus       = 12;
+handle_radius_top   = 22;
+handle_cube_offset  = handle_radius_top - ((cube_size + 0.1) / 2);
 module handle () {
     difference() {
         union() {
@@ -86,8 +101,8 @@ module handle () {
             }
         }
         
-        translate([handle_threads_offset, handle_threads_offset, 0])
-        threadsWithOffset();
+        translate([handle_cube_offset, handle_cube_offset, 0])
+        cubeNoThreads();
     }
 }
 
@@ -112,18 +127,5 @@ module handleWithLogo() {
             handle_height + 1])
         rotate([90, 0, 0])
         logo(desired_logo_size);
-    }
-}
-
-module testCube() {
-    // cube parameters
-    cube_threads_offset = (1/4) * mm_in_inch;
-    cube_size           = (thread_diameter * mm_in_inch) + cube_threads_offset;
-    cube_height         = (threads_length * mm_in_inch) + thread_offset_from_bottom + 10;
-    
-    difference() {
-        cube([cube_size, cube_size, cube_height]);
-        translate([cube_threads_offset / 2, cube_threads_offset / 2, 0])
-        threadsWithOffset();
     }
 }
