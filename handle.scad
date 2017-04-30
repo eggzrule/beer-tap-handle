@@ -23,7 +23,7 @@ thread_offset_from_bottom   = (0.1 * mm_in_inch);
 module threadsWithOffset () {
     radius = (thread_diameter / 2 * mm_in_inch);
     
-    //union () {
+    union () {
         translate([
             radius,
             radius,
@@ -43,7 +43,7 @@ module threadsWithOffset () {
             d       = (thread_diameter * mm_in_inch),
             center  = false
         );
-    //}
+    }
 }
 
 // handle parameters
@@ -52,59 +52,67 @@ handle_raidus           = 10;
 handle_radius_top       = 22;
 handle_threads_offset   = handle_radius_top - ((thread_diameter * mm_in_inch) / 2);
 module handle () {
-    //union() {
-        translate([handle_radius_top, handle_radius_top, handle_height / 2])
-        minkowski() {
-            cylinder(
-                h       = handle_height - 2,
-                r1      = handle_raidus - 2,
-                r2      = handle_radius_top - 2,
-                center  = true
-            );
-            sphere(1);
+    difference() {
+        union() {
+            translate([handle_radius_top, handle_radius_top, handle_height / 2])
+            minkowski() {
+                cylinder(
+                    h       = handle_height - 2,
+                    r1      = handle_raidus - 2,
+                    r2      = handle_radius_top - 2,
+                    center  = true
+                );
+                sphere(1);
+            }
+            
+            translate([
+                handle_radius_top,
+                handle_radius_top + 2,
+                handle_height + handle_radius_top - 3
+            ])
+            rotate([90,0,0])
+            minkowski() {
+                cube([
+                    (handle_radius_top * 2) - 10,
+                    (handle_radius_top * 2) - 10,
+                    3],
+                    true
+                );
+                cylinder(
+                    h       = 4,
+                    r       = 2,
+                    center  = true
+                );
+            }
         }
         
-        translate([
-            handle_radius_top,
-            handle_radius_top + 2,
-            handle_height + handle_radius_top - 3
-        ])
-        rotate([90,0,0])
-        minkowski() {
-            cube([
-                (handle_radius_top * 2) - 10,
-                (handle_radius_top * 2) - 10,
-                3],
-                true
-            );
-            cylinder(
-                h       = 4,
-                r       = 2,
-                center  = true
-            );
-        }
-    //}
+        translate([handle_threads_offset, handle_threads_offset, 0])
+        threadsWithOffset();
+    }
 }
 
+// logo constants
+logo_size   = 300;
+module logo(desired_size) {
+    conversion = desired_size / logo_size;
+    scale([conversion, conversion, 1])
+    import("logo/logo_300mm.stl");
+}
 
 module handleWithLogo() {
-    //union() {
+    union() {
         // build the handle
-        difference() {
-            handle();
-            translate([handle_threads_offset, handle_threads_offset, 0])
-            threadsWithOffset();
-        }
+        handle();
         
         // render the logo
-        logo_size = 36; //(handle_radius_top * 2) - 6 - 2; //currently 36mm
+        desired_logo_size = 36;
         translate([
-            (logo_size / 2) + 3 + 1,
+            3 + 1,
             handle_radius_top - 1.5 + 1,
-            (logo_size / 2) + handle_height])
+            handle_height + 1])
         rotate([90, 0, 0])
-        import("logo/logo_36mm.stl");
-    //}
+        logo(desired_logo_size);
+    }
 }
 
 module testCube() {
