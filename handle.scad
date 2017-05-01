@@ -9,10 +9,11 @@ mm_in_inch  = 25.4;
 // draw the handle
 //rotate([0,0,$t*360])
 //translate([-handle_radius_top, -handle_radius_top, 0])
-//handleWithLogo();
+handleWithLogo();
 
 // draw the test cube with threads
-cubeWithThreads();
+//translate([25, 0, 0])
+//cubeWithThreads();
 
 
 // thread parameters
@@ -46,6 +47,19 @@ module threadsWithOffset () {
     }
 }
 
+module annularSnap(length_of_snap, trailing_trim_length) {
+    translate([0,0,-0.01])
+    hull() {
+        cube([length_of_snap, 0.5, 0.51]);
+        
+        translate([0, 1, 0])
+        cube([length_of_snap, 0.5, 0.71]);
+    }
+    
+    translate([0, 1.5, -0.01])
+    cube([length_of_snap, trailing_trim_length, 0.251]);
+}
+
 // cube parameters
 cube_threads_offset = 3;
 cube_size           = (thread_diameter * mm_in_inch) + cube_threads_offset;
@@ -53,19 +67,44 @@ cube_height         = (threads_length * mm_in_inch) + thread_offset_from_bottom 
 module cubeWithThreads() {
     difference() {
         cubeNoThreads();
+        
         translate([cube_threads_offset / 2, cube_threads_offset / 2, 0])
         threadsWithOffset();
     }
 }
 module cubeNoThreads() {
-    cube([cube_size, cube_size, cube_height]);
+    difference() {
+        cube([cube_size, cube_size, cube_height]);
+        
+        // left
+        translate([0, 0, cube_height - 2.5])
+        rotate([90, 0, 90])
+        annularSnap(cube_size + 0.01, 1);
+        
+        // right
+        translate([cube_size, cube_size, cube_height - 2.5])
+        rotate([90, 0, 270])
+        annularSnap(cube_size + 0.01, 1);
+        
+        // front
+        translate([cube_size, 0, cube_height - 2.5])
+        rotate([90, 0, 180])
+        annularSnap(cube_size + 0.01, 1);
+        
+        // back
+        translate([0, cube_size, cube_height - 2.5])
+        rotate([90, 0, 0])
+        annularSnap(cube_size + 0.01, 1);
+    }
 }
 
 // handle parameters
 handle_height       = 80;
 handle_raidus       = 12;
 handle_radius_top   = 22;
-handle_cube_offset  = handle_radius_top - ((cube_size + 0.1) / 2);
+handle_cube_scale   = 1.08;
+handle_cube_size    = (cube_size * handle_cube_scale);
+handle_cube_offset  = handle_radius_top - (handle_cube_size / 2);
 module handle () {
     difference() {
         union() {
@@ -102,12 +141,14 @@ module handle () {
         }
         
         translate([handle_cube_offset, handle_cube_offset, 0])
+        scale([handle_cube_scale, handle_cube_scale, 1])
         cubeNoThreads();
     }
 }
 
 // logo constants
-logo_size   = 300;
+logo_size           = 300;
+desired_logo_size   = 36;
 module logo(desired_size) {
     conversion = desired_size / logo_size;
     scale([conversion, conversion, 1])
@@ -120,7 +161,6 @@ module handleWithLogo() {
         handle();
         
         // render the logo
-        desired_logo_size = 36;
         translate([
             3 + 1,
             handle_radius_top - 1.5 + 1,
