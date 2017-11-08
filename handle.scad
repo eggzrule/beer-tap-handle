@@ -2,16 +2,19 @@
 include <threads/threads_20161204.scad>
 
 // smoothness of anything rounded
-$fn         = 365;
+$fn         = 270;
 // millimeter to inches
 mm_in_inch  = 25.4;
 
 // draw the handle
 //rotate([0,0,$t*360])
 //translate([-handle_radius_top, -handle_radius_top, 0])
-handleWithLogo();
+handle();
+//handleWithLELogo();
+//handleWithMichiganLogo();
+//handleWithKentLogo();
 
-// draw the test cube with threads
+//draw the test cube with threads
 //translate([25, 0, 0])
 //cubeWithThreads();
 
@@ -146,26 +149,74 @@ module handle () {
     }
 }
 
-// logo constants
-logo_size           = 300;
-desired_logo_size   = 36;
-module logo(desired_size) {
-    conversion = desired_size / logo_size;
-    scale([conversion, conversion, 1])
-    import("logo/logo_300mm.stl");
+// LE logo constants
+le_logo_size    = 21.37;
+module LELogo(desired_size) {
+    conversion = desired_size / le_logo_size;
+    scale([conversion, conversion, 1.9])
+    import("logos/LeadingEDJE.stl");
 }
 
-module handleWithLogo() {
+// Michigan logo constants
+michigan_logo_size  = 33;
+module michiganLogo(desired_size) {
+    conversion = desired_size / michigan_logo_size;
+    scale([conversion, conversion, 1])
+    import("logos/Michigan_State.stl");
+}
+
+// Kent State logo constants
+kent_logo_size          = 35.52;
+module kentLogo(desired_size) {
+    conversion = desired_size / kent_logo_size;
+    scale([conversion, conversion, 0.75])
+    import("logos/Kent_State.stl");
+}
+
+desired_le_logo_size    = 36;
+module handleWithLELogo() {
     union() {
         // build the handle
         handle();
         
         // render the logo
         translate([
-            3 + 1,
-            handle_radius_top - 1.5 + 1,
-            handle_height + 1])
+            (desired_le_logo_size/2) + 4,
+            handle_radius_top - 1,
+            handle_height + 18])
         rotate([90, 0, 0])
-        logo(desired_logo_size);
+        LELogo(desired_le_logo_size);
+    }
+}
+
+desired_michigan_logo_size  = 34;
+module handleWithMichiganLogo() {
+    union() {
+        // build the handle
+        handle();
+        
+        // render the logo
+        translate([
+            (desired_michigan_logo_size/2) + 5,
+            handle_radius_top - 1,
+            handle_height + 19])
+        rotate([90, 0, 0])
+        michiganLogo(desired_michigan_logo_size);
+    }
+}
+
+desired_kent_logo_size  = 36;
+module handleWithKentLogo() {
+    union() {
+        // build the handle
+        handle();
+        
+        // render the logo
+        translate([
+            (desired_kent_logo_size/2) + 4,
+            handle_radius_top - 1,
+            handle_height + 19])
+        rotate([90, 0, 0])
+        kentLogo(desired_kent_logo_size);
     }
 }
